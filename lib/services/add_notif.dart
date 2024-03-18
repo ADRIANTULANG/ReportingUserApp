@@ -1,0 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:responder/services/add_push_notification.dart';
+
+Future addNotif(
+    name, contactnumber, address, caption, imageURL, lat, long) async {
+  final docUser = FirebaseFirestore.instance.collection('Notifs').doc();
+
+  final json = {
+    'name': name,
+    'address': address,
+    'caption': caption,
+    'status': 'Pending',
+    'userId': FirebaseAuth.instance.currentUser!.uid,
+    'contactnumber': contactnumber,
+    'imageURL': imageURL,
+    'dateTime': DateTime.now(),
+    'lat': lat,
+    'long': long,
+    'responder': ''
+  };
+
+  await docUser.set(json);
+  await sendNotif(message: "A new report has been submitted");
+}
