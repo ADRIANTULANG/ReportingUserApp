@@ -38,6 +38,7 @@ class _TrackingTabState extends State<TrackingTab> {
         Map mapdata = reports[i].data();
         mapdata['documentID'] = reports[i].id;
         mapdata['dateTime'] = mapdata['dateTime'].toDate().toString();
+        mapdata['remarks'] = mapdata['remarks'] ?? "";
         data.add(mapdata);
       }
       log(jsonEncode(data));

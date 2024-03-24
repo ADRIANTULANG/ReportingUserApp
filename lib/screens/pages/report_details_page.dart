@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -25,9 +25,16 @@ class _ReportDetailsState extends State<ReportDetails> {
   Set<Marker> markers = {};
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+  GoogleMapController? mapController;
+  LatLngBounds? bounds;
   CameraPosition? kGooglePlex;
   bool isShowContainer = true;
   TextEditingController remarks = TextEditingController();
+  StreamSubscription<dynamic>? locationListener;
+  Stream? locationStreamer;
+  String distance = '';
+  String time = '';
+
   getResponderDetails() async {
     try {
       if (widget.reportDetails.responder != "" ||
@@ -127,35 +134,137 @@ class _ReportDetailsState extends State<ReportDetails> {
         });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initializedData();
-  }
-
   initializedData() async {
     Future.delayed(const Duration(milliseconds: 500), () async {
       LoadingDialog.showLoadingDialog(context: context);
       await getResponderDetails();
-      setState(() {
-        markers.add(Marker(
-          markerId: MarkerId(widget.reportDetails.name),
-          icon: BitmapDescriptor.defaultMarker,
-          position: LatLng(widget.reportDetails.lat, widget.reportDetails.long),
-          infoWindow: InfoWindow(
-            title: widget.reportDetails.caption,
-            snippet: 'Status: ${widget.reportDetails.status}',
-          ),
-        ));
-        kGooglePlex = CameraPosition(
-          target: LatLng(widget.reportDetails.lat, widget.reportDetails.long),
-          zoom: 14.4746,
-        );
-      });
+      await listenToLocationOfResponder();
       if (context.mounted) {
         Navigator.pop(context);
       }
     });
+  }
+
+  listenToLocationOfResponder() async {
+    try {
+      locationStreamer = FirebaseFirestore.instance
+          .collection('Reports')
+          .doc(widget.reportDetails.documentId)
+          .snapshots();
+
+      locationListener = locationStreamer!.listen((event) async {
+        Map data = event.data();
+        if (data.containsKey('responderLat')) {
+          var distanceAndTime = await fetchDistanceAndTime(
+              LatLng(widget.reportDetails.lat, widget.reportDetails.long),
+              LatLng(data['responderLat'], data['responderLong']));
+          log(distanceAndTime.toString());
+          time = distanceAndTime['durationText'];
+          distance = distanceAndTime['distanceText'];
+        }
+        setState(() {
+          markers.clear();
+          markers.add(Marker(
+            markerId: MarkerId(widget.reportDetails.name),
+            icon: BitmapDescriptor.defaultMarker,
+            position:
+                LatLng(widget.reportDetails.lat, widget.reportDetails.long),
+            infoWindow: InfoWindow(
+              title: widget.reportDetails.caption,
+              snippet: 'Status: ${widget.reportDetails.status}',
+            ),
+          ));
+          if (data.containsKey('responderLat')) {
+            LatLng location1 = LatLng(widget.reportDetails.lat,
+                widget.reportDetails.long); // Location 1
+            LatLng location2 = LatLng(
+                data['responderLat'], data['responderLong']); // Location 2
+
+            bounds = LatLngBounds(
+              southwest: LatLng(
+                location1.latitude < location2.latitude
+                    ? location1.latitude
+                    : location2.latitude,
+                location1.longitude < location2.longitude
+                    ? location1.longitude
+                    : location2.longitude,
+              ),
+              northeast: LatLng(
+                location1.latitude > location2.latitude
+                    ? location1.latitude
+                    : location2.latitude,
+                location1.longitude > location2.longitude
+                    ? location1.longitude
+                    : location2.longitude,
+              ),
+            );
+            markers.add(Marker(
+              markerId: const MarkerId("ResponderLocation"),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueBlue),
+              position: LatLng(data['responderLat'], data['responderLong']),
+              infoWindow: InfoWindow(
+                title: "Responder",
+                snippet: "${data['name']} ($distance - $time)",
+              ),
+            ));
+            mapController!.animateCamera(
+              CameraUpdate.newLatLngBounds(bounds!, 50),
+            );
+          }
+        });
+      });
+    } catch (_) {
+      log("ERROR (listenToLocationOfResponder): $_");
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchDistanceAndTime(
+      LatLng origin, LatLng destination) async {
+    const String apiKey = 'AIzaSyDdXaMN5htLGHo8BkCfefPpuTauwHGXItU';
+    final String apiUrl =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data['status'] == 'OK') {
+        final legs = data['routes'][0]['legs'][0];
+        final distanceText = legs['distance']['text'];
+        final distanceValue = legs['distance']['value'];
+        final durationText = legs['duration']['text'];
+        final durationValue = legs['duration']['value'];
+
+        return {
+          'distanceText': distanceText,
+          'distanceValue': distanceValue,
+          'durationText': durationText,
+          'durationValue': durationValue,
+        };
+      }
+    }
+
+    throw Exception('Failed to fetch distance and time');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    kGooglePlex = CameraPosition(
+      target: LatLng(widget.reportDetails.lat, widget.reportDetails.long),
+      zoom: 14.4746,
+    );
+    initializedData();
+  }
+
+  @override
+  void dispose() {
+    if (locationListener != null) {
+      locationListener!.cancel();
+    }
+    super.dispose();
   }
 
   @override
@@ -176,6 +285,7 @@ class _ReportDetailsState extends State<ReportDetails> {
                         initialCameraPosition: kGooglePlex!,
                         onMapCreated: (GoogleMapController controller) {
                           _controller.complete(controller);
+                          mapController = controller;
                         },
                       ),
                     ),
@@ -287,15 +397,18 @@ class _ReportDetailsState extends State<ReportDetails> {
                                     SizedBox(
                                       height: 2.h,
                                     ),
-                                    Container(
-                                      height: 15.h,
-                                      width: 100.w,
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: NetworkImage(widget
-                                                  .reportDetails.imageUrl))),
-                                    ),
+                                    widget.reportDetails.imageUrl == ""
+                                        ? const SizedBox()
+                                        : Container(
+                                            height: 15.h,
+                                            width: 100.w,
+                                            decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                    image: NetworkImage(widget
+                                                        .reportDetails
+                                                        .imageUrl))),
+                                          ),
                                     SizedBox(
                                       height: 3.h,
                                     ),
