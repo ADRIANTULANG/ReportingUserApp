@@ -29,26 +29,29 @@ class ReportHistory {
   String status;
   String remarks;
   String documentId;
+  String? level;
+  String? responderRemarks;
 
-  ReportHistory({
-    required this.dateTime,
-    required this.address,
-    required this.contactnumber,
-    required this.year,
-    required this.responder,
-    required this.caption,
-    required this.type,
-    required this.remarks,
-    required this.userId,
-    required this.long,
-    required this.month,
-    required this.imageUrl,
-    required this.name,
-    required this.day,
-    required this.lat,
-    required this.status,
-    required this.documentId,
-  });
+  ReportHistory(
+      {required this.dateTime,
+      required this.address,
+      required this.contactnumber,
+      required this.year,
+      required this.responder,
+      required this.caption,
+      required this.type,
+      required this.remarks,
+      required this.userId,
+      required this.long,
+      required this.month,
+      required this.imageUrl,
+      required this.name,
+      required this.day,
+      required this.lat,
+      required this.status,
+      required this.documentId,
+      this.responderRemarks,
+      this.level});
 
   factory ReportHistory.fromJson(Map<String, dynamic> json) => ReportHistory(
         dateTime: DateTime.parse(json["dateTime"]),
@@ -68,6 +71,8 @@ class ReportHistory {
         lat: json["lat"]?.toDouble(),
         status: json["status"],
         documentId: json["documentID"],
+        responderRemarks: json["responderRemarks"],
+        level: json["level"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -88,5 +93,7 @@ class ReportHistory {
         "lat": lat,
         "status": status,
         "documentID": documentId,
+        "level": level,
+        "responderRemarks": responderRemarks,
       };
 }

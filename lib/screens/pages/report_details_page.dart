@@ -245,7 +245,6 @@ class _ReportDetailsState extends State<ReportDetails> {
         };
       }
     }
-
     throw Exception('Failed to fetch distance and time');
   }
 
@@ -424,9 +423,6 @@ class _ReportDetailsState extends State<ReportDetails> {
                                                   fontSize: 13.sp,
                                                 ),
                                               ),
-                                              SizedBox(
-                                                height: 2.h,
-                                              ),
                                               Text(
                                                 responderDetails!.name,
                                                 style: TextStyle(
@@ -463,6 +459,50 @@ class _ReportDetailsState extends State<ReportDetails> {
                                               ),
                                             ),
                                           ),
+                                    widget.reportDetails.responderRemarks !=
+                                            null
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: 2.h,
+                                              ),
+                                              Text(
+                                                "Responder Remarks",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13.sp,
+                                                ),
+                                              ),
+                                              Text(
+                                                widget.reportDetails
+                                                    .responderRemarks!,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 13.sp,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 2.h,
+                                              ),
+                                              Text(
+                                                "Level",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13.sp,
+                                                ),
+                                              ),
+                                              Text(
+                                                widget.reportDetails.level!,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 13.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const SizedBox.shrink(),
                                     SizedBox(
                                       height: 2.h,
                                     ),
