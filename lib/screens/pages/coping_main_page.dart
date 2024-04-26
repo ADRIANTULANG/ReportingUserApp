@@ -4,6 +4,7 @@ import 'package:responder/screens/pages/coping_tabs/fire_tab.dart';
 import 'package:responder/screens/pages/coping_tabs/flood_tab.dart';
 import 'package:responder/screens/pages/coping_tabs/hurricane_tab.dart';
 import 'package:responder/screens/pages/coping_tabs/landslide_tab.dart';
+import 'package:responder/screens/pages/coping_tabs/suffocate_tab.dart';
 import '../../widgets/text_widget.dart';
 
 class CopingMainScreen extends StatelessWidget {
@@ -13,7 +14,8 @@ class CopingMainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(251, 128, 222, 243).withOpacity(0.5),
+        backgroundColor:
+            const Color.fromARGB(251, 128, 222, 243).withOpacity(0.5),
         title: TextWidget(
           text: 'COPING TIPS',
           fontSize: 18,
@@ -36,10 +38,10 @@ class CopingMainScreen extends StatelessWidget {
                   GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const HurricaneTab()));
+                            builder: (context) => const LandslideTab()));
                       },
-                      child:
-                          cardWidget('assets/images/image 2.png', 'Hurricane')),
+                      child: cardWidget(
+                          'assets/images/landslide.png', 'Landslide')),
                   GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
@@ -74,21 +76,21 @@ class CopingMainScreen extends StatelessWidget {
               const SizedBox(
                 height: 40,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const LandslideTab()));
-                    },
-                    child: SizedBox(
-                        width: 200,
-                        child: cardWidget(
-                            'assets/images/landslide.png', 'Landslide')),
-                  )
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () {
+              //         Navigator.of(context).push(MaterialPageRoute(
+              //             builder: (context) => const LandslideTab()));
+              //       },
+              //       child: SizedBox(
+              //           width: 200,
+              //           child: cardWidget(
+              //               'assets/images/landslide.png', 'Landslide')),
+              //     )
+              //   ],
+              // ),
             ],
           )),
     );
@@ -123,7 +125,7 @@ class CopingMainScreen extends StatelessWidget {
       width: 160,
       height: 170,
       decoration: BoxDecoration(
-        color: Color.fromARGB(248, 188, 190, 190).withOpacity(0.5),
+        color: const Color.fromARGB(248, 188, 190, 190).withOpacity(0.5),
         border: Border.all(
           color: Colors.black,
         ),

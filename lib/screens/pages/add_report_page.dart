@@ -138,14 +138,7 @@ class _AddReportPageState extends State<AddReportPage> {
   ];
   String addressSelected = 'PUROK 1';
 
-  List<String> type1 = [
-    'Fire',
-    'Hurricane',
-    'Flood',
-    'Earthquake',
-    'Landslide',
-    'Others'
-  ];
+  List<String> type1 = ['Fire', 'Flood', 'Earthquake', 'Landslide', 'Others'];
   String selected = 'Fire';
 
   bool validateFields() {

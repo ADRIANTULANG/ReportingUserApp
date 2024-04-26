@@ -15,7 +15,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
     'burn 1.png',
     'blood-droplet 1.png',
     'injury 1.png',
-    'antibacterial 1.png',
+    'suffocateicon.png',
     'heart-attack 1.png',
     'shock-sign 1.png'
   ];
@@ -24,7 +24,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
     'BURN',
     'BLEEDING',
     'INJURY',
-    'ALLERGIES',
+    'SUFFOCATE',
     'HEART ATTACK',
     'SHOCK'
   ];
@@ -33,7 +33,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
     'https://www.verywellhealth.com/first-aid-for-burns-5208710',
     'https://www.verywellhealth.com/how-to-control-bleeding-1298304',
     'https://www.verywellhealth.com/sports-injuries-4013926',
-    'https://www.verywellhealth.com/how-food-allergy-is-treated-4773095',
+    'https://onlinefirstaid.com/suffocation-and-strangulation/',
     'https://www.verywellhealth.com/heart-attack-7229012',
     'https://www.verywellhealth.com/types-of-shock-4018329'
   ];
@@ -42,9 +42,10 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(251, 128, 222, 243).withOpacity(0.5),
+          backgroundColor:
+              const Color.fromARGB(251, 128, 222, 243).withOpacity(0.5),
           title: TextWidget(
-            text: 'FIRST AID TIPS',
+            text: 'FIRSTAID TIPS',
             fontSize: 18,
             color: const Color.fromARGB(255, 8, 8, 8),
             fontFamily: 'Bold',

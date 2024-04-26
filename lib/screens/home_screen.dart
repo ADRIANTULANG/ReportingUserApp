@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => const FirstAidScreen()));
                 },
-                child: card('LEARN FIRST AID', Icons.medical_information)),
+                child: card('LEARN FIRSTAID', Icons.medical_information)),
             const SizedBox(
               height: 20,
             ),
